@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Owner</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+
+    <body>
+        <nav>
+            <a href="index.html">Customer Route</a>
+            <a href="setting.html">Settings</a>
+        </nav>
+
+        <h2>Owner route testing</h2>
+
+        <div>
+            <h4>GET: all reservations</h4>
+            <button id="getall">Get All</button>
+        </div><br><br>
+
+        <div>
+            <h4>GET: by date and time</h4>
+            <label for="date">Date:</label>
+            <input type='date' name="date" id='calendar' min="">
+            <label for="time">Date:</label>
+            <select name="time" id="dropdownTime">
+                <option value="">All</option>
+                <option value="12:00:00">12PM-2PM</option>
+                <option value="14:00:00">2PM-4PM</option>
+                <option value="16:00:00">4PM-6PM</option>
+                <option value="18:00:00">6PM-8PM</option>
+                <option value="20:00:00">8PM-10PM</option>
+            </select>
+            <button id="clear">Clear</button><br>
+        </div>
+        
+        <div id="container"></div>
+        <div id="message"></div>
+
+        <script src="app_owner.js"></script>
+    </body>
+</html>

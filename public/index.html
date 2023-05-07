@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+ 
+
+  <body>
+    <nav>
+      <a href="index.html">Customer Route</a>
+      <a href="owner.html">Owner Routes</a>
+    </nav>
+
+    <h2>customer route testing</h2>
+    <div class="add-new-order">
+      <form id='new-order'>
+        <label for="date">Date:</label>
+        <input type='date' name="date" id='date' min=""><br>
+        <!-- time dropdown list to be populated by javascript app_customer.js-->
+        <select name="time" id="time">
+          <option value="none">Pick a time</option>
+        </select>
+        <label for="num_of_ppl">Number Of People:</label>
+        <input type='number' name="num_of_ppl" min='1' max="6"><br>
+        <label for="name">Name:</label>
+        <input type='text' name="name"><br>
+        <label for="email">Your Email Address:</label>
+        <input type='email' name="email"><br>
+
+        <label for="order_type">Reserve for:</label>
+        <select name="order_type" id="order_type">
+          <option value="standard">Standard</option>
+          <option value="hotpot" id="order_hotpot">Hotpot</option>
+          <option value="barbecue">Barbecue</option>
+        </select><br>
+
+        <label for="message">Anything you want to let us know:</label>
+        <textarea id="message" name="message" rows="4" cols="50" 
+        placeholder="allergy, request etc."></textarea><br>
+        <input type="submit" name="submit" id ='submit' value='Reserve'>
+      </form>
+    </div>
+
+
+    <div id="confirmation">
+    </div>
+
+    <div id="debug"></div>
+    
+    <script src="app_customer.js" type='module'></script>
+  </body>
+</html>

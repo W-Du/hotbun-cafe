@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Owner Settings</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+
+    <body>
+        <nav>
+            <a href="owner.html">Owner Routes</a>
+        </nav>
+
+        <h2>Settings Routes</h2>
+
+        <div>
+            <h4>GET: by date</h4>
+            <label for="date">Date:</label>
+            <input type='date' name="date" id='getCalendar' min=""><br>
+        </div>
+
+        <div>
+            <h4>POST / PUT / DELETE</h4>
+            <form>
+                <input type="checkbox" id="add-one" name="add-one" value="one">
+                <label for="add-one">Update by each day</label><br>
+                <label for="start">From: </label>
+                <input type='date' name="start" id='startday' require min="">
+                <label for="end">Till: </label>
+                <input type="date" name="end" id='endday' min="">
+                <label for="max_reserv">Set max_reservations to be: </label>
+                <input type="number" name="max_reserv" require min="0">
+                <button id="post">Update</button>
+                <button id="delete">Delete</button>
+            </form>
+        </div>
+
+
+        <br><br>
+        <div id="container"></div>
+        <div id="message"></div>
+
+        <script src="app_setting.js"></script>
+    </body>
+</html>
