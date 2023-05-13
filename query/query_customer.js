@@ -71,17 +71,7 @@ const getHourSummary = (req, res, next) => {
     })
 }
 
-//helper: delete expired reservations
-const deleteExpired = (req, res, next) => {
-    const today = new Date().toISOString().split('T')[0];
-    pool.query('DELETE FROM reservations WHERE date < $1', [today], (err, result) => {
-        if (err){
-            res.status(500).json(err)
-        } else {
-            res.status(204).send()
-        }
-    })
-}
+
 
 
 
@@ -89,5 +79,4 @@ module.exports = {
     addReservation,
     checkFullDate,
     getHourSummary,
-    deleteExpired
  }

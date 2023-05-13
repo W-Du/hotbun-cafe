@@ -15,25 +15,6 @@ const getAvailabilityByDate = (req, res, next) => {
     });
   };
 
-// const checkDataByRange = (req, res, next) => {
-//     //const { startDay, endDay } = req.body;
-//     const startDay = req.query.start
-//     const endDay = req.query.end
-//     const queryStr = 'SELECT date FROM available WHERE date >= $1::date AND date <= $2::date';
-//     pool.query(queryStr, [startDay, endDay], (err, result) => {
-//         if(err) {
-//             res.status(500).json(err)
-//         } else {
-//             if(result.rows.length === 0){
-//                 res.status(200).json([])
-//             } else {
-//                 const ext = result.rows.map(row => row.date)
-//                 res.status(200).json(ext)
-//             }
-//         }
-//     })
-// }
-
 const updateAvailable = (req, res, next) => {
   const max_reservations = req.body.max_reservations;
   const date = JSON.parse(req.body.date)
@@ -48,7 +29,7 @@ const updateAvailable = (req, res, next) => {
   queryStr += `ON CONFLICT (date) DO UPDATE 
   SET max_reservations = excluded.max_reservations;`
 
-  pool.query(queryStr, (err, result) => {
+  pool.query(queryStr, (err, result) => {deletePastAvailable
     if(err) {
       res.status(500).json(err)
     } else {
@@ -82,9 +63,23 @@ const deleteDay = (req, res, next) => {
   })
 }
 
+const deletePastAvailable = (req, res, next) => {
+  const today = new Date().toISOString().split('T')[0];
+  const queryStr = 'DELETE FROM available WHERE date < $1'
+  pool.query(queryStr, [today], (err, result) => {
+    if(err){
+      res.status(500).json(err)
+    } else {
+      res.status(204).json(result)
+    }
+  })
+}
+
+
   module.exports = {
     getAvailabilityByDate, 
     updateAvailable, 
     deleteRange,
     deleteDay,
+    deletePastAvailable
   }

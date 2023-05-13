@@ -26,6 +26,20 @@ function requestDeleteRow (btn) {
   })
 }
 
+//remove data dated before today
+function deletePastData() {
+  $.ajax({
+    url: '/helper/expired',
+    type: "DELETE",
+    success: (response) => {
+      message.textContent = 'Data of past days deleted'
+    },
+    error: (err) => {
+      renderError(err)
+    }
+  })
+}
+
 function createDeleteButton (row) {
   const deleteBtn = document.createElement('button')
   deleteBtn.innerText = "X"
@@ -37,6 +51,7 @@ function createDeleteButton (row) {
 
 const renderResults = (results, emptyMessage = '') => {
   container.innerHTML = ''
+  message.innerHTML = ''
   if (results.length > 0) {
     results.forEach(row => {
       const l = document.createElement('div')
@@ -63,7 +78,7 @@ const renderResults = (results, emptyMessage = '') => {
       container.appendChild(l)
     })
   } else {
-    container.innerHTML = `<p> ${emptyMessage} </p>`
+    container.innerHTML = `<p> ${emptyMessage} </ps>`
   }
 }
 
@@ -83,8 +98,7 @@ function disablePastDates() {
 // onload
 $(document).ready(function() {
   disablePastDates();
-
-  //deletePastResvervations();
+  deletePastData();
   if(!datePicker.value){
     dropdownTime.disabled = true;
   }

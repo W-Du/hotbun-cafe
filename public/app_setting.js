@@ -13,8 +13,22 @@ function disablePastDates() {
     getDatePicker.min = today;
     startDatePicker.min = today;
     endDatePicker.min = today;
-
 }
+
+//remove data dated before today
+function deletePastAvailable() {
+    $.ajax({
+        url: '/helper/available/expired',
+        type: "DELETE",
+        success: (response) => {
+            message.textContent = 'Data of past availability deleted'
+        },
+        error: (err) => {
+            renderError(err)
+        }
+    })
+}
+
 
 function renderResults(result) {
     container.innerHTML = '' 
@@ -51,46 +65,11 @@ function restart(){
 }
 
 
-// //get row.count()
-// function checkDbRange(start, end) {
-//     const daysArr = getDaysArray(start, end);
-//     const startDay = new Date(start).toISOString().split('T')[0]
-//     const endDay = new Date(end).toISOString().split('T')[0]
-//     // let formData = {
-//     //     startDay: new Date(start).toISOString().split('T')[0], 
-//     //     endDay: new Date(end).toISOString().split('T')[0]
-//     // }
-
-//     return new Promise(function(resolve, reject) {
-//         $.ajax({
-//             type: 'GET',
-//             url: `/available/range?start=${startDay}&end=${endDay}`,
-//             dataType: 'json',
-//             success: (response) => {
-//                 let result = {
-//                     'existing': [],
-//                     'non_existing': []
-//                 }
-//                 response.forEach(r => result.existing.push(r.split('T')[0]))
-//                 daysArr.forEach(day => {
-//                     if(!result.existing.includes(day)) {
-//                         result.non_existing.push(day)
-//                     }
-//                 })
-//                 message.textContent += result.non_existing
-//                 resolve(result)
-//             },
-//             error: (err) => {
-//                 reject(err)
-//             }
-//         })   
-//     })
-// }
-
 
 
 $(document).ready(function() {
     disablePastDates();
+    deletePastAvailable();
     restart();
 })
 
