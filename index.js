@@ -9,23 +9,27 @@ app.use(bodyParser.urlencoded({extended: false,}))
 app.use(express.static("public"));
 
 const { 
-  getCustomers, 
+  getReservations, 
   getReservationsByDay,
-  deleteReservationById } = require('./query/query_owner.js')
+  deleteReservationById,
+  deleteExpired } = require('./query/query_owner.js')
+
 const { 
   addReservation, 
   checkFullDate,
-  getHourSummary,
-  deleteExpired } = require('./query/query_customer.js')
+  checkClosedDate,
+  getHourSummary } = require('./query/query_customer.js')
+  
 const {
   getAvailabilityByDate,
   deleteRange,
   updateAvailable,
-  deleteDay } = require('./query/query_setting.js')
+  deleteDay,
+  deletePastAvailable } = require('./query/query_setting.js')
 
 
 //owner
-app.get('/reservations', getCustomers);
+app.get('/reservations', getReservations);
 app.get('/reservations/by', getReservationsByDay);
 app.delete('/reservations/delete-row', deleteReservationById);
 
@@ -34,15 +38,27 @@ app.post('/reservations/new', addReservation);
 
 //helper queries in app_customers
 app.get('/helper/fully-booked', checkFullDate);
+app.get('/helper/closed', checkClosedDate);
 app.get('/helper/by', getHourSummary);
 app.delete('/helper/expired', deleteExpired);
+app.delete('/helper/available/expired', deletePastAvailable);
 
 //settings
 app.get('/available/by', getAvailabilityByDate);
 app.post('/available/update', updateAvailable);
 app.delete('/available/delete-range', deleteRange);
-app.delete('/available/delete-day', deleteDay)
+app.delete('/available/delete-day', deleteDay);
 
+
+
+//default html page
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html')
+})
+
+app.get('/owner', (req, res) => {
+  res.sendFile(__dirname + '/public/owner.html')
+})
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)

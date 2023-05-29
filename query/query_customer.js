@@ -2,9 +2,10 @@ const pool = require('../db/pool.js')
 const u = require('./util.js')
 
 const addReservation = (req, res) => {
-    const { date, time, num_ppl, order_type } = req.body;
-    const query = 'INSERT INTO reservations (date, time, num_ppl, order_type) VALUES ($1,$2,$3,$4)';
-    pool.query(query, [date, time, num_ppl, order_type], (err, result) => {
+    const { date, time, num_ppl, order_type, name, email, message } = req.body;
+    const query = `INSERT INTO reservations (date, time, num_ppl, order_type, name, email, message) 
+    VALUES ($1,$2,$3,$4,$5,$6,$7);`;
+    pool.query(query, [date, time, num_ppl, order_type, name, email, message], (err, result) => {
         if (err) {
             console.error(err);
             res.status(500).json('Error adding data to database');
@@ -38,6 +39,18 @@ const checkFullDate = (req, res, next) => {
     })
 }
 
+const checkClosedDate = (req, res, next) => {
+    pool.query('SELECT date FROM available WHERE max_reservations = 0;', (err, result) => {
+        if(err) {
+            res.status(500).json(err)
+        } else {
+            const closedDays = result.rows.map(row => row.date)
+            if(closedDays){
+                res.status(200).json(closedDays);
+            } 
+        }
+    })
+}
 
 //helper: check in which timeloat all tables are full
 const getHourSummary = (req, res, next) => {
@@ -71,23 +84,13 @@ const getHourSummary = (req, res, next) => {
     })
 }
 
-//helper: delete expired reservations
-const deleteExpired = (req, res, next) => {
-    const today = new Date().toISOString().split('T')[0];
-    pool.query('DELETE FROM reservations WHERE date < $1', [today], (err, result) => {
-        if (err){
-            res.status(500).json(err)
-        } else {
-            res.status(204).send()
-        }
-    })
-}
+
 
 
 
 module.exports = { 
     addReservation,
     checkFullDate,
+    checkClosedDate,
     getHourSummary,
-    deleteExpired
  }
