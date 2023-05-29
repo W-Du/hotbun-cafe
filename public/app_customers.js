@@ -7,22 +7,28 @@ const timeSelect = document.getElementById('time')
 const timeOptions = timeSelect.getElementsByTagName('option')
 const mealOptHotpot = document.getElementById('order_hotpot');
 
-
+const today = new Date().toISOString().split('T')[0];
 
 //VARIABLES
-let disabledDates = []
+let fullDates = []
+let closedDates = []
 
 // Function to disable all past dates before today
 function disablePastDates() {
-  const today = new Date().toISOString().split('T')[0];
   datePicker.min = today;
+}
+
+function disableAfterDates() {
+    const d = new Date(today);
+    const nd = new Date(d.valueOf() + 60*24*60*60*1000).toISOString().split('T')[0];
+    datePicker.max = nd;
 }
 
 //helper functions
 function renderError(error) {
   confirmContainer.innerHTML = '';
   confirmContainer.textContent += error.statusText;
-  confirmContainer.textContent += '<br><p>There is an error, pls try again</p>'
+  confirmContainer.textContent += 'There is an error, pls try again'
 }
 
 //populate time drop down list
@@ -40,30 +46,29 @@ function populateTime() {
   }
 }
 
-//remove data dated before today
-function deletePastData() {
-  $.ajax({
-    url: '/helper/expired',
-    type: "DELETE",
-    success: (response) => {
-      confirmContainer.textContent = 'Data of past days deleted'
-    },
-    error: (err) => {
-      renderError(err)
-    }
-  })
-}
+// //remove data dated before today
+// function deletePastData() {
+//   $.ajax({
+//     url: '/helper/expired',
+//     type: "DELETE",
+//     success: (response) => {
+//       confirmContainer.textContent = 'Data of past days deleted'
+//     },
+//     error: (err) => {
+//       renderError(err)
+//     }
+//   })
+// }
 
 //disable fully booked days
-function disableFullyBooked() {
+function alertFullyBooked() {
   $.ajax({
     url: '/helper/fully-booked',
     type: 'GET',
     success: function(fullyBookedDates) {
       fullyBookedDates.forEach((date) => {
         const dateStr = date.split('T')[0]
-        disabledDates.push(dateStr);
-        
+        fullDates.push(dateStr);
       });
       // const t = typeof(disabledDates)
       // confirmContainer.textContent += t
@@ -75,15 +80,33 @@ function disableFullyBooked() {
   });
 }
 
+//disable closed days
+function alertClosed() {
+    $.ajax({
+        url:'/helper/closed',
+        type: 'GET',
+        success: (closed) => {
+            closed.forEach((date) => {
+                const dateStr = date.split('T')[0]
+                closedDates.push(dateStr)
+            });
+        },
+        error: (error) => {
+            console.log(error)
+        }
+    })
+}
+
 
 
 //when document is ready
 $(document).ready(function() {
 
   disablePastDates();
+  disableAfterDates();
   populateTime();
-  //deletePastData();
-  disableFullyBooked();
+  alertFullyBooked();
+  alertClosed();
 })
 
 
@@ -94,9 +117,12 @@ datePicker.addEventListener('change', (e) => {
   mealOptHotpot.disabled = false;
   let date = new Date(datePicker.value).toISOString().split('T')[0];
   let fullHoursPot = [];
-  if(disabledDates.includes(date)){
+  if(fullDates.includes(date)){
     datePicker.value = '';
     alert('fully booked')
+  } else if (closedDates.includes(date)) {
+    datePicker.value = ''
+    alert(`Sorry, we are closed on ${date}`)
   }
 
   try{
@@ -175,10 +201,5 @@ reserveForm.addEventListener('submit', (e) => {
     timeSelect.value = 'none'
   }
 });
-
-
-
-
-
 
 

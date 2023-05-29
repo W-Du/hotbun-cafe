@@ -4,11 +4,39 @@ const container = document.querySelector('#container');
 const message = document.getElementById('message');
 const dropdownTime = document.getElementById('dropdownTime');
 const clearButton = document.getElementById('clear');
+const resultTable = document.getElementById('result');
 
 //helper functions
+//remove data dated before today
+function deletePastData() {
+  $.ajax({
+    url: '/helper/expired',
+    type: "DELETE",
+    success: (response) => {
+      message.textContent = 'Data of past days deleted'
+    },
+    error: (err) => {
+      renderError(err)
+    }
+  })
+}
 
-//delete a row
-function requestDeleteRow (btn) {
+function disablePastDates() {
+  const today = new Date().toISOString().split('T')[0];
+  datePicker.min = today;
+}
+
+//create delete button for each row
+function createDeleteButton (row) {
+  const deleteBtn = document.createElement('button')
+  deleteBtn.innerText = "X"
+  deleteBtn.setAttribute('class', 'deleteRow')
+  deleteBtn.setAttribute('rowID', row.id)
+  return deleteBtn;
+}
+
+//delete a reservation from database
+function requestDeleteReservation (btn) {
   const id = btn.getAttribute('rowID')
   
   return new Promise((resolve, reject) => {
@@ -26,46 +54,63 @@ function requestDeleteRow (btn) {
   })
 }
 
-function createDeleteButton (row) {
-  const deleteBtn = document.createElement('button')
-  deleteBtn.innerText = "X"
-  deleteBtn.setAttribute('class', 'deleteRow')
-  deleteBtn.setAttribute('rowID', row.id)
-  return deleteBtn;
-}
-
-
-const renderResults = (results, emptyMessage = '') => {
-  container.innerHTML = ''
-  if (results.length > 0) {
-    results.forEach(row => {
-      const l = document.createElement('div')
-      l.textContent = `date: ${row['date']} at ${row['time']}
-      number of people: ${row['num_ppl']}.
-      type: ${row['order_type']}`
-      const b = createDeleteButton(row)
-      b.addEventListener('click', (e) => {
-        e.preventDefault();
-        //message.textContent += 'X clicked '
-        if(confirm(`Do you want to delete reservation on ${row.date}?`)){
-          requestDeleteRow(b)
-          .then((response) => {
-            l.remove()
-            message.innerHTML = ''
-            message.innerHTML = 'reservation with id ' 
-            + row.id + ' on ' + row.date + ' is deleted.'
-          }).catch((e) => {
-            console.log(e)
-          })
-        }
-      })
-      l.appendChild(b)
-      container.appendChild(l)
-    })
-  } else {
-    container.innerHTML = `<p> ${emptyMessage} </p>`
+//clear table
+function clearTable(table) {
+  while(table.rows.length > 1){
+    table.deleteRow(1);
   }
 }
+
+//populate table
+function populateTable(results) {
+  const cellArray = ['id', 'date', 'time', 'num_ppl', 'order_type', 'name', 'email', 'message'];
+  results.forEach(row => {
+    const tableRow = document.createElement('tr')
+    for(let i = 0; i < cellArray.length; i++){
+      const td = document.createElement('td');
+      //modify 'date'
+      if(cellArray[i] === 'date'){
+        td.textContent = row.date.split('T')[0]
+      } else {
+        td.textContent = row[cellArray[i]]
+      }
+      tableRow.appendChild(td);
+    }
+    tableRow.setAttribute('rowId', row.id)
+
+    //delete button
+    const b = createDeleteButton(row)
+    b.addEventListener('click', (e) => {
+      e.preventDefault();
+      if(confirm(`Do you want to delete reservation on ${row.date}?`)){
+        requestDeleteReservation(b)
+        .then((response) => {
+          tableRow.remove()
+          message.innerHTML = 'reservation with id ' 
+          + row.id + ' on ' + date + ' is deleted.'
+        }).catch((e) => {
+          console.log(e)
+        })
+      }
+    })
+    tableRow.appendChild(b)
+    resultTable.appendChild(tableRow);
+  })
+}
+
+//render result
+const renderResults = (results, emptyMessage = '') => {
+  container.innerHTML = ''
+  message.innerHTML = ''
+  resultTable.style.visibility = 'visible';
+  clearTable(resultTable);
+  if (results.length > 0) {
+    populateTable(results);
+  } else {
+    container.innerHTML = `<p> ${emptyMessage} </ps>`
+  }
+}
+
 
 const renderError = err => {
   container.innerHTML = ''
@@ -74,20 +119,16 @@ const renderError = err => {
   <p>${err.statusText}</p>`;
 }
 
-function disablePastDates() {
-  const today = new Date().toISOString().split('T')[0];
-  datePicker.min = today;
-}
 
 
 // onload
 $(document).ready(function() {
   disablePastDates();
-
-  //deletePastResvervations();
+  deletePastData();
   if(!datePicker.value){
     dropdownTime.disabled = true;
   }
+  resultTable.style.visibility = 'hidden';
 })
 
 
@@ -132,6 +173,8 @@ clearButton.addEventListener('click', (e) => {
   datePicker.value = ''
   dropdownTime.disabled = true;
   container.innerHTML = '';
+  clearTable(resultTable);
+  resultTable.style.visibility = 'hidden';
 })
 
 dropdownTime.addEventListener('change',(e) => {

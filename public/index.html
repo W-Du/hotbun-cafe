@@ -9,24 +9,23 @@
   <body>
     <nav>
       <a href="index.html">Customer Route</a>
-      <a href="owner.html">Owner Routes</a>
     </nav>
 
     <h2>customer route testing</h2>
     <div class="add-new-order">
       <form id='new-order'>
         <label for="date">Date:</label>
-        <input type='date' name="date" id='date' min=""><br>
+        <input type='date' name="date" id='date' min="" max="" required><br>
         <!-- time dropdown list to be populated by javascript app_customer.js-->
-        <select name="time" id="time">
-          <option value="none">Pick a time</option>
+        <select name="time" id="time" required>
+          <option value="">Pick a time</option>
         </select>
         <label for="num_of_ppl">Number Of People:</label>
-        <input type='number' name="num_of_ppl" min='1' max="6"><br>
+        <input type='number' name="num_of_ppl" min='1' max="6" required><br>
         <label for="name">Name:</label>
-        <input type='text' name="name"><br>
+        <input type='text' name="name" required><br>
         <label for="email">Your Email Address:</label>
-        <input type='email' name="email"><br>
+        <input type='email' name="email" required><br>
 
         <label for="order_type">Reserve for:</label>
         <select name="order_type" id="order_type">
@@ -48,6 +47,7 @@
 
     <div id="debug"></div>
     
-    <script src="app_customer.js" type='module'></script>
+    <script src="app_customers.js" type='module'></script>
+    <!--<script src="testing.js"></script>-->
   </body>
 </html>
