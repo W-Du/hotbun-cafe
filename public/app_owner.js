@@ -61,6 +61,62 @@ function clearTable(table) {
   }
 }
 
+//remove data dated before today
+function deletePastData() {
+  $.ajax({
+    url: '/helper/expired',
+    type: "DELETE",
+    success: (response) => {
+      message.textContent = 'Data of past days deleted'
+    },
+    error: (err) => {
+      renderError(err)
+    }
+  })
+}
+
+function createDeleteButton (row) {
+  const deleteBtn = document.createElement('button')
+  deleteBtn.innerText = "X"
+  deleteBtn.setAttribute('class', 'deleteRow')
+  deleteBtn.setAttribute('rowID', row.id)
+  return deleteBtn;
+}
+
+
+// const renderResults = (results, emptyMessage = '') => {
+//   container.innerHTML = ''
+//   message.innerHTML = ''
+//   if (results.length > 0) {
+//     results.forEach(row => {
+//       const l = document.createElement('div')
+//       l.textContent = `date: ${row['date']} at ${row['time']}
+//       number of people: ${row['num_ppl']}.
+//       type: ${row['order_type']}`
+//       const b = createDeleteButton(row)
+//       b.addEventListener('click', (e) => {
+//         e.preventDefault();
+//         //message.textContent += 'X clicked '
+//         if(confirm(`Do you want to delete reservation on ${row.date}?`)){
+//           requestDeleteRow(b)
+//           .then((response) => {
+//             l.remove()
+//             message.innerHTML = ''
+//             message.innerHTML = 'reservation with id ' 
+//             + row.id + ' on ' + row.date + ' is deleted.'
+//           }).catch((e) => {
+//             console.log(e)
+//           })
+//         }
+//       })
+//       l.appendChild(b)
+//       container.appendChild(l)
+//     })
+//   } else {
+//     container.innerHTML = `<p> ${emptyMessage} </ps>`
+//   }
+// }
+
 //populate table
 function populateTable(results) {
   const cellArray = ['id', 'date', 'time', 'num_ppl', 'order_type', 'name', 'email', 'message'];
@@ -167,7 +223,7 @@ datePicker.addEventListener('change', (evt) => {
       renderError(err)
     }
   })
-})
+});
 
 clearButton.addEventListener('click', (e) => {
   datePicker.value = ''
@@ -175,7 +231,7 @@ clearButton.addEventListener('click', (e) => {
   container.innerHTML = '';
   clearTable(resultTable);
   resultTable.style.visibility = 'hidden';
-})
+});
 
 dropdownTime.addEventListener('change',(e) => {
   e.preventDefault();
@@ -198,6 +254,5 @@ dropdownTime.addEventListener('change',(e) => {
   } else {
     container.innerHTML = 'No reservation made for these hours'
   }
-})
-
+});
 

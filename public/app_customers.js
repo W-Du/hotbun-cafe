@@ -46,19 +46,6 @@ function populateTime() {
   }
 }
 
-// //remove data dated before today
-// function deletePastData() {
-//   $.ajax({
-//     url: '/helper/expired',
-//     type: "DELETE",
-//     success: (response) => {
-//       confirmContainer.textContent = 'Data of past days deleted'
-//     },
-//     error: (err) => {
-//       renderError(err)
-//     }
-//   })
-// }
 
 //disable fully booked days
 function alertFullyBooked() {
