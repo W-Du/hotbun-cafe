@@ -1,5 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const path = require('path')
 const app = express()
 const port = process.env.PORT || 3000
 process.env.TZ = 'UTC'
@@ -8,6 +9,8 @@ process.env.TZ = 'UTC'
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false,}))
 app.use(express.static("public"));
+// app.set('view engine', 'ejs');
+// app.set('views', path.join(__dirname, 'views'));
 
 //routers
 const ownerRouter = require('./routers/router_owner.js')
@@ -22,9 +25,12 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html')
 })
 
-app.get('/owner', (req, res) => {
-  res.sendFile(__dirname + '/public/owner.html')
-})
+app.get('/owner.html', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html')
+});
+
+
+
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)
