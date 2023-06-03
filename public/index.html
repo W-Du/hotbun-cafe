@@ -23,7 +23,7 @@
         <label for="num_of_ppl">Number Of People:</label>
         <input type='number' name="num_of_ppl" min='1' max="6" required><br>
         <label for="name">Name:</label>
-        <input type='text' name="name" required><br>
+        <input type='text' name="name" minlength="3" maxlength="40" required><br>
         <label for="email">Your Email Address:</label>
         <input type='email' name="email" required><br>
 
@@ -39,6 +39,13 @@
         placeholder="allergy, request etc."></textarea><br>
         <input type="submit" name="submit" id ='submit' value='Reserve'>
       </form>
+    </div>
+
+    <br><br>
+
+    <div id="alert">
+      <div id="alert-message"></div>
+      <button id="alert-close">Close</button>
     </div>
 
 

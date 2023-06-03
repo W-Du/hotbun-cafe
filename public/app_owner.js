@@ -10,7 +10,7 @@ const resultTable = document.getElementById('result');
 //remove data dated before today
 function deletePastData() {
   $.ajax({
-    url: '/helper/expired',
+    url: '/owner/helper/expired',
     type: "DELETE",
     success: (response) => {
       message.textContent = 'Data of past days deleted'
@@ -41,7 +41,7 @@ function requestDeleteReservation (btn) {
   
   return new Promise((resolve, reject) => {
     $.ajax({
-      url: '/reservations/delete-row?id=' + id,
+      url: '/owner/reservations/delete-row?id=' + id,
       type: 'DELETE',
       dataType: 'json',
       success: (response) => {
@@ -61,20 +61,6 @@ function clearTable(table) {
   }
 }
 
-//remove data dated before today
-function deletePastData() {
-  $.ajax({
-    url: '/helper/expired',
-    type: "DELETE",
-    success: (response) => {
-      message.textContent = 'Data of past days deleted'
-    },
-    error: (err) => {
-      renderError(err)
-    }
-  })
-}
-
 function createDeleteButton (row) {
   const deleteBtn = document.createElement('button')
   deleteBtn.innerText = "X"
@@ -83,39 +69,6 @@ function createDeleteButton (row) {
   return deleteBtn;
 }
 
-
-// const renderResults = (results, emptyMessage = '') => {
-//   container.innerHTML = ''
-//   message.innerHTML = ''
-//   if (results.length > 0) {
-//     results.forEach(row => {
-//       const l = document.createElement('div')
-//       l.textContent = `date: ${row['date']} at ${row['time']}
-//       number of people: ${row['num_ppl']}.
-//       type: ${row['order_type']}`
-//       const b = createDeleteButton(row)
-//       b.addEventListener('click', (e) => {
-//         e.preventDefault();
-//         //message.textContent += 'X clicked '
-//         if(confirm(`Do you want to delete reservation on ${row.date}?`)){
-//           requestDeleteRow(b)
-//           .then((response) => {
-//             l.remove()
-//             message.innerHTML = ''
-//             message.innerHTML = 'reservation with id ' 
-//             + row.id + ' on ' + row.date + ' is deleted.'
-//           }).catch((e) => {
-//             console.log(e)
-//           })
-//         }
-//       })
-//       l.appendChild(b)
-//       container.appendChild(l)
-//     })
-//   } else {
-//     container.innerHTML = `<p> ${emptyMessage} </ps>`
-//   }
-// }
 
 //populate table
 function populateTable(results) {
@@ -158,7 +111,7 @@ function populateTable(results) {
 const renderResults = (results, emptyMessage = '') => {
   container.innerHTML = ''
   message.innerHTML = ''
-  resultTable.style.visibility = 'visible';
+  resultTable.style.display = 'block';
   clearTable(resultTable);
   if (results.length > 0) {
     populateTable(results);
@@ -184,14 +137,14 @@ $(document).ready(function() {
   if(!datePicker.value){
     dropdownTime.disabled = true;
   }
-  resultTable.style.visibility = 'hidden';
+  resultTable.style.display = 'none';
 })
 
 
 //get all
 getAllButton.addEventListener('click', () => {
   // Fetch data from the back end API using the fetch() function
-  fetch('/reservations')
+  fetch('/owner/reservations')
     .then(response => {
       return response.json()
     })
@@ -211,7 +164,7 @@ datePicker.addEventListener('change', (evt) => {
   //message.textContent = selectedDate
   
   $.ajax({
-    url:`/reservations/by?date=${selectedDate}`,
+    url:`/owner/reservations/by?date=${selectedDate}`,
     type: 'GET',
     dataType: 'json',
     success: function(results) {
@@ -230,7 +183,7 @@ clearButton.addEventListener('click', (e) => {
   dropdownTime.disabled = true;
   container.innerHTML = '';
   clearTable(resultTable);
-  resultTable.style.visibility = 'hidden';
+  resultTable.style.display = 'none';
 });
 
 dropdownTime.addEventListener('change',(e) => {
@@ -252,6 +205,7 @@ dropdownTime.addEventListener('change',(e) => {
   if(resultByTime.length > 0){
     renderResults(resultByTime)
   } else {
+    resultTable.style.display='none'
     container.innerHTML = 'No reservation made for these hours'
   }
 });
