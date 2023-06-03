@@ -6,6 +6,9 @@ const debugContainer = document.getElementById('debug')
 const timeSelect = document.getElementById('time')
 const timeOptions = timeSelect.getElementsByTagName('option')
 const mealOptHotpot = document.getElementById('order_hotpot');
+const alert = document.getElementById("alert");
+const buttonAlertClose = document.getElementById("alert-close");
+const alertMessage = document.getElementById('alert-message')
 
 const today = new Date().toISOString().split('T')[0];
 
@@ -48,7 +51,7 @@ function populateTime() {
 
 
 //disable fully booked days
-function alertFullyBooked() {
+function checkFullyBooked() {
   $.ajax({
     url: '/helper/fully-booked',
     type: 'GET',
@@ -68,32 +71,66 @@ function alertFullyBooked() {
 }
 
 //disable closed days
-function alertClosed() {
-    $.ajax({
-        url:'/helper/closed',
-        type: 'GET',
-        success: (closed) => {
-            closed.forEach((date) => {
-                const dateStr = date.split('T')[0]
-                closedDates.push(dateStr)
-            });
-        },
-        error: (error) => {
-            console.log(error)
-        }
-    })
+function checkClosed() {
+  $.ajax({
+    url:'/helper/closed',
+    type: 'GET',
+    success: (closed) => {
+      closed.forEach((date) => {
+          const dateStr = date.split('T')[0]
+          closedDates.push(dateStr)
+      });
+    },
+    error: (error) => {
+      console.log(error)
+    }
+  })
 }
 
+
+//customized alert
+function showAlert(message) {
+
+  alert.style.display = "block";
+  alertMessage.textContent = ''
+  alertMessage.textContent = message
+
+  disableForm() 
+
+  // Attach event listener to the custom alert close button
+  buttonAlertClose.addEventListener("click", function() {
+    alert.style.display = "none";
+    const alertCloseEvent = new Event("alertclose");
+    window.dispatchEvent(alertCloseEvent);
+  });
+}
+
+//disble and enable the form
+function disableForm() {
+  const formElements = reserveForm.elements;
+  for (let i = 0; i < formElements.length; i++) {
+    formElements[i].disabled = true;
+  }
+}
+
+function enableForm() {
+  const formElements = reserveForm.elements;
+  for (let i = 0; i < formElements.length; i++) {
+    formElements[i].disabled = false;
+  }
+}
 
 
 //when document is ready
 $(document).ready(function() {
 
+  enableForm();
   disablePastDates();
   disableAfterDates();
   populateTime();
-  alertFullyBooked();
-  alertClosed();
+  checkFullyBooked();
+  checkClosed();
+  alert.style.display = "none";
 })
 
 
@@ -105,12 +142,16 @@ datePicker.addEventListener('change', (e) => {
   let date = new Date(datePicker.value).toISOString().split('T')[0];
   let fullHoursPot = [];
   if(fullDates.includes(date)){
-    datePicker.value = '';
-    alert('fully booked')
+    showAlert(`${date} is fully booked`)
   } else if (closedDates.includes(date)) {
-    datePicker.value = ''
-    alert(`Sorry, we are closed on ${date}`)
+    showAlert(`Sorry, we are closed on ${date}`)    
   }
+  window.addEventListener('alertclose', () => {
+    enableForm();
+    datePicker.value = ''
+    datePicker.valueAsDate = null
+
+  })
 
   try{
     $.ajax({
@@ -176,6 +217,15 @@ reserveForm.addEventListener('submit', (e) => {
           confirmContainer.innerHTML = `
           <h4>We received your reservation!</h4>
           <p> We expect you on ${response['date']} at ${response['time']} </p>`
+          const btnConfirm = document.createElement('button')
+          btnConfirm.textContent = 'OK'
+          confirmContainer.appendChild(btnConfirm)
+          btnConfirm.addEventListener('click', () => {
+            btnConfirm.style.display = 'none'
+            location.reload()
+          })
+          disableForm();
+
       },
       error: (error) => {
         renderError(error)

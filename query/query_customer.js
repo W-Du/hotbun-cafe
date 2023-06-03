@@ -1,15 +1,24 @@
 const pool = require('../db/pool.js')
 const u = require('./util.js')
+const validator = require('validator');
 
 const addReservation = (req, res) => {
     const { date, time, num_ppl, order_type, name, email, message } = req.body;
+    const emailS = validator.normalizeEmail(email)
+    const nameS = validator.escape(name)
+    const messageS = validator.escape(message)
     const query = `INSERT INTO reservations (date, time, num_ppl, order_type, name, email, message) 
     VALUES ($1,$2,$3,$4,$5,$6,$7);`;
-    pool.query(query, [date, time, num_ppl, order_type, name, email, message], (err, result) => {
+    pool.query(query, [date, time, num_ppl, order_type, nameS, emailS, messageS], (err, result) => {
         if (err) {
             console.error(err);
             res.status(500).json('Error adding data to database');
         } else {
+            // const responseData = {
+            //     date: req.body.date.toString().split('T')[0],
+            //     time: req.body.time.toString()
+            // }
+            // res.render('confirm', {data: responseData});
             res.status(201).json(req.body);
         }
     });

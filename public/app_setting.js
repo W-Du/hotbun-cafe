@@ -19,7 +19,7 @@ function disablePastDates() {
 //remove data dated before today
 function deletePastAvailable() {
     $.ajax({
-        url: '/helper/available/expired',
+        url: '/owner/helper/available/expired',
         type: "DELETE",
         success: (response) => {
             message.textContent = 'Data of past availability deleted'
@@ -82,7 +82,7 @@ getDatePicker.addEventListener('change', (e) => {
     try{
         $.ajax({
             type: 'GET',
-            url: '/available/by?date=' + daySelected,
+            url: '/owner/available/by?date=' + daySelected,
             success: (response) => {
                 renderResults(response)
             },
@@ -127,7 +127,7 @@ ButtonPost.addEventListener('click', (e) => {
 
     $.ajax({
         type: 'POST',
-        url:'/available/update',
+        url:'/owner/available/update',
         data: formData,
         dataType: 'json',
         success: (response) => {
@@ -146,7 +146,7 @@ ButtonDelete.addEventListener('click', (e) => {
     if(oneDayCheckbox.checked === false) {
         end = endDatePicker.value;
         $.ajax({
-            url: `available/delete-range?start=${start}&end=${end}`,
+            url: `/owner/available/delete-range?start=${start}&end=${end}`,
             type: 'DELETE',
             success: (response) => {
                 container.textContent = `data between ${start} and ${end} is deleted`
@@ -157,7 +157,7 @@ ButtonDelete.addEventListener('click', (e) => {
         })
     } else {
         $.ajax({
-            url: `available/delete-day?day=${start}`,
+            url: `/owner/available/delete-day?day=${start}`,
             type: 'DELETE',
             success: (response) => {
                 container.textContent = `data for ${start} is deleted`
